@@ -16,6 +16,14 @@ python -m legion.main "Inspect this workspace and summarize it"
 
 Legion is tuned for the Windows ROG Ally profile (about 12 GB usable shared memory). Start with a quantized 3B-or-smaller model and 4-6 turns; larger models or long sessions can compete with games, Windows, and Docker's WSL VM for memory.
 
+Once Docker Desktop is installed and running, use the repeatable Ally startup path:
+
+```powershell
+.\scripts\start-legion.ps1
+```
+
+The script verifies Python, Ollama, and Docker before starting the gateway. It refuses to continue when Docker is unavailable and pulls `llama3.2:3b` only when the model is missing.
+
 Ollama is expected at `http://localhost:11434/v1` by default. Override it with `LEGION_OLLAMA_BASE_URL`. API-compatible fallback routing can be configured with `LEGION_API_BASE_URL`, `LEGION_API_MODEL`, and `LEGION_API_KEY`.
 
 ## Webhook gateway
