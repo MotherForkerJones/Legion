@@ -17,7 +17,7 @@
     <main class="command-grid">
       <section class="hero-panel panel-glow">
         <div class="hero-copy"><p class="eyebrow">THE SEVENTH CIRCLE // LIVE SESSION</p><h1>Lucifer commands.</h1><p class="hero-subtitle">Lucifer is the prime demon and sovereign of the lattice. Every task descends through a named specialist before his throne decides its fate.</p></div>
-        <div class="sigil" aria-hidden="true"><span>✦</span><i></i><b></b></div>
+        <div class="seer-stage" aria-label="Legion's infernal tarot seer giving guidance"><canvas id="seer-canvas" width="520" height="360"></canvas><div class="seer-card seer-card-left">THE<br>PATH</div><div class="seer-card seer-card-right">THE<br>FLAME</div><div class="seer-caption"><span class="pulse"></span> THE SEER SPEAKS // READ THE LEDGER BELOW</div></div>
         <div class="hero-stats"><div><small>MODEL</small><strong id="model-label">LOCAL / UNKNOWN</strong></div><div><small>CONTAINMENT</small><strong class="green">DOCKER ISOLATED</strong></div><div><small>THRONE</small><strong>LUCIFER / ONLINE</strong></div></div>
       </section>
 
@@ -40,6 +40,7 @@
 
   <dialog id="settings-dialog"><form method="dialog" id="settings-form"><div class="dialog-heading"><span class="section-kicker">CONNECTION SEAL</span><button class="icon-button" value="cancel" aria-label="Close settings">×</button></div><label>Bearer token<input id="token-input" type="password" placeholder="Paste LEGION_AUTH_TOKEN"></label><p>Stored only in this browser session. The local gateway requires it for task execution.</p><div class="dialog-actions"><button value="cancel" class="secondary-button">CANCEL</button><button value="default" class="primary-button" id="save-token">SAVE SEAL</button></div></form></dialog>
   <script src="/web/world.js"></script>
+  <script src="/web/seer.js"></script>
   <script src="/web/app.js"></script>
 </body>
 </html>
