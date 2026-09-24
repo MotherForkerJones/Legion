@@ -11,6 +11,10 @@ Legion is a local-first, model-agnostic agent harness. Keep all durable behavior
 - Preserve the event trace: observations, model decisions, tool calls, and results.
 - Ask for clarification rather than guessing when a destructive or ambiguous action is requested.
 
+## ROG Ally profile
+
+The reference device is a Windows ROG Ally with approximately 12 GB usable shared memory. Keep local inference practical: prefer a quantized 3B-or-smaller Ollama model, keep `LEGION_MAX_TURNS` at 4-6 for routine tasks, avoid concurrent tool calls, and never assume a discrete GPU or unlimited VRAM. Docker Desktop/WSL is optional at startup but mandatory before any command tool is enabled.
+
 ## Extension points
 
 - Add an LLM provider by implementing `ChatProvider` in `core/router.py`.
