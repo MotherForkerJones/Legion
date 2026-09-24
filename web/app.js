@@ -6,6 +6,7 @@ const status = document.getElementById('run-status');
 const healthLabel = document.getElementById('health-label');
 const tokenInput = document.getElementById('token-input');
 const dialog = document.getElementById('settings-dialog');
+const planchetteText = document.getElementById('planchette-text');
 
 function token() { return sessionStorage.getItem('legion-token') || ''; }
 function addLine(kind, text) {
@@ -17,6 +18,7 @@ function addLine(kind, text) {
 }
 function escapeHtml(value) { return value.replace(/[&<>'"]/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[character])); }
 function setBusy(busy) { sendButton.disabled = busy; input.disabled = busy; status.textContent = busy ? 'DESCENDING' : 'STANDBY'; status.style.color = busy ? 'var(--red)' : 'var(--muted)'; }
+function updatePlanchette() { if (planchetteText) planchetteText.textContent = input.value ? input.value.slice(-22).toUpperCase() : 'TYPE YOUR PETITION'; }
 
 async function checkHealth() {
   try {
@@ -42,7 +44,23 @@ async function runTask(prompt, agentId = 'chorus') {
   } catch (error) { addLine('error', error.message); }
   finally { setBusy(false); window.LegionWorld?.clear(); }
 }
-form.addEventListener('submit', event => { event.preventDefault(); const prompt = input.value.trim(); input.value = ''; runTask(prompt, 'chorus'); });
+const boardLetters = document.getElementById('board-letters');
+if (boardLetters) {
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(letter => {
+    const key = document.createElement('button'); key.type = 'button'; key.className = 'board-key'; key.dataset.key = letter; key.textContent = letter;
+    key.addEventListener('click', () => { if (!sendButton.disabled) { input.value += letter; updatePlanchette(); input.focus(); } }); boardLetters.appendChild(key);
+  });
+}
+document.querySelectorAll('.board-key[data-key]').forEach(key => key.addEventListener('click', () => {
+  if (sendButton.disabled || key.closest('#board-letters')) return;
+  const action = key.dataset.key;
+  if (action === 'BACKSPACE') input.value = input.value.slice(0, -1);
+  if (action === 'SPACE') input.value += ' ';
+  if (action === 'CLEAR') input.value = '';
+  updatePlanchette(); input.focus();
+}));
+input.addEventListener('input', updatePlanchette);
+form.addEventListener('submit', event => { event.preventDefault(); const prompt = input.value.trim(); input.value = ''; updatePlanchette(); runTask(prompt, 'chorus'); });
 const defaultDemonNames = {auditor:'THE AUDITOR',scribe:'THE SCRIBE',oracle:'THE ORACLE',executioner:'THE EXECUTIONER',herald:'THE HERALD',chorus:'THE CHORUS'};
 let savedDemonNames = {};
 try { savedDemonNames = JSON.parse(localStorage.getItem('legion-demon-names') || '{}'); } catch (_) { savedDemonNames = {}; }
