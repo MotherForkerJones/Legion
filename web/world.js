@@ -44,11 +44,11 @@
     ctx.restore(); ctx.globalAlpha = 1;
   }
   function architecture() {
-    const pillars = [{x:26, h:285}, {x:174, h:220}, {x:1022, h:220}, {x:1150, h:285}];
+    const pillars = [{x:26, h:285}, {x:174, h:220}, {x:574, h:220}, {x:1005, h:220}, {x:1220, h:220}, {x:1540, h:285}, {x:1740, h:220}];
     pillars.forEach(({x, h}) => { ctx.fillStyle = '#211b25'; ctx.fillRect(x, 62, 38, h); ctx.fillStyle = '#403342'; ctx.fillRect(x + 6, 62, 8, h); ctx.fillStyle = '#0d0b11'; ctx.fillRect(x - 9, 50, 56, 15); ctx.fillStyle = '#312536'; ctx.fillRect(x - 5, 46, 48, 7); });
-    path([[48,62], [48,23], [162,23], [184,62]], '#17121b', '#6e2b3a', 2); path([[1020,62], [1038,23], [1152,23], [1152,62]], '#17121b', '#6e2b3a', 2);
-    for (let i = 0; i < 6; i++) { const x = 220 + i * 160; ctx.fillStyle = '#372631'; ctx.fillRect(x, 62, 5, 83); ctx.fillStyle = '#4d2b35'; ctx.fillRect(x - 4, 59, 13, 7); }
-    ctx.fillStyle = '#d34442'; ctx.globalAlpha = .7; for (let i = 0; i < 7; i++) path([[231 + i * 154, 64], [273 + i * 154, 118], [315 + i * 154, 64]], '#8e253820'); ctx.globalAlpha = 1;
+    path([[48,62], [48,23], [162,23], [184,62]], '#17121b', '#6e2b3a', 2); path([[1540,62], [1560,23], [1725,23], [1740,62]], '#17121b', '#6e2b3a', 2);
+    for (let i = 0; i < 10; i++) { const x = 220 + i * 160; ctx.fillStyle = '#372631'; ctx.fillRect(x, 62, 5, 83); ctx.fillStyle = '#4d2b35'; ctx.fillRect(x - 4, 59, 13, 7); }
+    ctx.fillStyle = '#d34442'; ctx.globalAlpha = .7; for (let i = 0; i < 10; i++) path([[231 + i * 154, 64], [273 + i * 154, 118], [315 + i * 154, 64]], '#8e253820'); ctx.globalAlpha = 1;
   }
   function lava(time) {
     const y = 500; ctx.fillStyle = '#260d15'; ctx.fillRect(0, y, canvas.width, canvas.height - y); ctx.strokeStyle = '#6d2830'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(0, y + 3); ctx.bezierCurveTo(250, y - 15, 420, y + 17, 650, y); ctx.bezierCurveTo(850, y - 13, 1000, y + 16, canvas.width, y - 3); ctx.stroke();
@@ -76,6 +76,12 @@
     else { path([[x - 17, y - 8], [x - 31, y - 38], [x - 8, y - 25]], agent.color); path([[x + 17, y - 8], [x + 31, y - 38], [x + 8, y - 25]], agent.color); }
     ctx.fillStyle = agent.kind === 'hooded' ? '#17121c' : '#411522'; ctx.beginPath(); ctx.arc(x, y - 7, 22, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = agent.color; ctx.stroke();
     ctx.fillStyle = agent.accent; ctx.fillRect(x - 11, y - 10, 7, 3); ctx.fillRect(x + 4, y - 10, 7, 3); ctx.fillStyle = active ? '#fff1c4' : agent.color; ctx.fillRect(x - 6, y + 4, 12, 2);
+    if (agent.id === 'auditor') { ctx.strokeStyle = agent.accent; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x + 23, y + 28); ctx.lineTo(x + 35, y - 8); ctx.stroke(); path([[x + 29, y - 13], [x + 43, y - 5], [x + 34, y + 3]], agent.accent); }
+    if (agent.id === 'scribe') { ctx.fillStyle = agent.accent; ctx.fillRect(x - 35, y + 12, 15, 13); ctx.strokeStyle = '#7d4a35'; ctx.strokeRect(x - 35, y + 12, 15, 13); ctx.fillStyle = '#7d4a35'; ctx.fillRect(x - 32, y + 16, 9, 1); }
+    if (agent.id === 'oracle') { ctx.fillStyle = agent.accent; ctx.beginPath(); ctx.arc(x + 29, y - 2, 7 + Math.sin(time / 170) * 2, 0, Math.PI * 2); ctx.fill(); glow(x + 29, y - 2, 28, agent.accent, .24); }
+    if (agent.id === 'executioner') { ctx.strokeStyle = agent.accent; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x - 28, y - 30); ctx.lineTo(x - 28, y + 29); ctx.stroke(); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x - 39, y - 27); ctx.lineTo(x - 17, y - 27); ctx.stroke(); }
+    if (agent.id === 'herald') { ctx.strokeStyle = agent.accent; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x + 24, y + 34); ctx.lineTo(x + 24, y - 30); ctx.stroke(); ctx.fillStyle = agent.accent; ctx.beginPath(); ctx.moveTo(x + 24, y - 31); ctx.lineTo(x + 46, y - 22); ctx.lineTo(x + 24, y - 14); ctx.fill(); }
+    if (agent.id === 'chorus') { ctx.fillStyle = agent.accent; ctx.beginPath(); ctx.arc(x + 27, y - 1, 6, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#201622'; ctx.fillRect(x + 24, y - 3, 2, 2); ctx.fillRect(x + 29, y - 3, 2, 2); }
     text(names[agent.id] || agent.id.toUpperCase(), x, y + 63, 9, active ? '#fff1c4' : '#c0aeb5', 'center'); text(active ? 'WORKING' : 'STANDBY', x, y + 76, 7, active ? agent.accent : '#776772', 'center');
   }
   function lucifer(time) {
