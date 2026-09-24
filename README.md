@@ -33,6 +33,7 @@ python -m legion.main --web --port 8787
 ```
 
 Use `GET /health` or `POST /run` with `{ "prompt": "..." }`.
+The gateway prints an ephemeral `LEGION_AUTH_TOKEN` at startup. Send it as `Authorization: Bearer <token>` for `/run`, or set `LEGION_AUTH_TOKEN` before launch for a stable token.
 
 ## Isolation
 
