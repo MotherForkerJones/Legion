@@ -44,16 +44,20 @@ async function runTask(prompt, agentId = 'chorus') {
   } catch (error) { addLine('error', error.message); }
   finally { setBusy(false); window.LegionWorld?.clear(); }
 }
+function appendBoardValue(value) { if (!sendButton.disabled) { input.value += value; updatePlanchette(); input.focus(); } }
 const boardLetters = document.getElementById('board-letters');
 if (boardLetters) {
-  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(letter => {
-    const key = document.createElement('button'); key.type = 'button'; key.className = 'board-key'; key.dataset.key = letter; key.textContent = letter;
-    key.addEventListener('click', () => { if (!sendButton.disabled) { input.value += letter; updatePlanchette(); input.focus(); } }); boardLetters.appendChild(key);
-  });
+  'ABCDEFGHIJKLM'.split('').forEach(letter => { const key=document.createElement('button'); key.type='button'; key.className='board-key'; key.dataset.key=letter; key.textContent=letter; key.addEventListener('click',()=>appendBoardValue(letter)); boardLetters.appendChild(key); });
+  'NOPQRSTUVWXYZ'.split('').forEach(letter => { const key=document.createElement('button'); key.type='button'; key.className='board-key'; key.dataset.key=letter; key.textContent=letter; key.addEventListener('click',()=>appendBoardValue(letter)); boardLetters.appendChild(key); });
 }
+const boardNumbers = document.getElementById('board-numbers');
+if (boardNumbers) '1234567890'.split('').forEach(number => { const key=document.createElement('button'); key.type='button'; key.className='board-key number-key'; key.dataset.key=number; key.textContent=number; key.addEventListener('click',()=>appendBoardValue(number)); boardNumbers.appendChild(key); });
 document.querySelectorAll('.board-key[data-key]').forEach(key => key.addEventListener('click', () => {
   if (sendButton.disabled || key.closest('#board-letters')) return;
   const action = key.dataset.key;
+  if (/^[0-9]$/.test(action)) return;
+  if (action === 'YES' || action === 'NO') appendBoardValue(`[${action}]`);
+  if (action === 'GOODBYE') appendBoardValue(' GOODBYE');
   if (action === 'BACKSPACE') input.value = input.value.slice(0, -1);
   if (action === 'SPACE') input.value += ' ';
   if (action === 'CLEAR') input.value = '';
