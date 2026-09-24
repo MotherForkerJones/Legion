@@ -7,6 +7,11 @@ const healthLabel = document.getElementById('health-label');
 const tokenInput = document.getElementById('token-input');
 const dialog = document.getElementById('settings-dialog');
 const planchetteText = document.getElementById('planchette-text');
+const stationLog = document.getElementById('station-log');
+const missionList = document.getElementById('mission-list');
+const queueCount = document.getElementById('queue-count');
+const queueMeter = document.getElementById('queue-meter-fill');
+let activeRuns = 0;
 
 function token() { return sessionStorage.getItem('legion-token') || ''; }
 function addLine(kind, text) {
@@ -15,6 +20,31 @@ function addLine(kind, text) {
   line.innerHTML = `<span class="kind">[ ${kind} ]</span> ${escapeHtml(String(text))}`;
   output.appendChild(line);
   output.scrollTop = output.scrollHeight;
+}
+function stationMessage(message, active = false) {
+  if (!stationLog) return;
+  const row = document.createElement('div'); if (active) row.className = 'active-log';
+  row.innerHTML = `<time>NOW</time><span>${escapeHtml(message)}</span>`; stationLog.prepend(row);
+  while (stationLog.children.length > 12) stationLog.lastElementChild.remove();
+}
+function setCrewStatus(agentId, state) {
+  const card = document.querySelector(`.crew-card[data-crew="${agentId}"]`); if (!card) return;
+  const statusText = card.querySelector('em'); const detail = card.querySelector('small');
+  card.classList.toggle('active', state === 'WORKING'); if (statusText) statusText.textContent = state === 'WORKING' ? 'WORKING' : 'READY';
+  if (detail) detail.textContent = detail.textContent.replace(/ · (STANDBY|WORKING|READY)$/, ` · ${state}`);
+}
+function queueMission(agentId, prompt) {
+  if (!missionList) return null;
+  if (missionList.querySelector('.empty-mission')) missionList.innerHTML = '';
+  const item = document.createElement('div'); item.className = 'mission-item'; item.dataset.agent = agentId;
+  item.innerHTML = `<time>ACTIVE // ${escapeHtml(agentId.toUpperCase())}</time><span>${escapeHtml(prompt.slice(0, 78))}</span>`; missionList.prepend(item);
+  activeRuns += 1; if (queueCount) queueCount.textContent = String(activeRuns).padStart(2, '0'); if (queueMeter) queueMeter.style.width = `${Math.min(activeRuns * 25, 100)}%`;
+  return item;
+}
+function finishMission(item, agentId, success) {
+  if (item) { item.classList.add('complete'); item.querySelector('time').textContent = success ? 'COMPLETE' : 'FAILED'; }
+  activeRuns = Math.max(0, activeRuns - 1); if (queueCount) queueCount.textContent = String(activeRuns).padStart(2, '0'); if (queueMeter) queueMeter.style.width = `${Math.min(activeRuns * 25, 100)}%`;
+  setCrewStatus(agentId, 'READY');
 }
 function escapeHtml(value) { return value.replace(/[&<>'"]/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[character])); }
 function setBusy(busy) { sendButton.disabled = busy; input.disabled = busy; status.textContent = busy ? 'DESCENDING' : 'STANDBY'; status.style.color = busy ? 'var(--red)' : 'var(--muted)'; }
@@ -31,18 +61,20 @@ async function checkHealth() {
 async function runTask(prompt, agentId = 'chorus') {
   if (!prompt || sendButton.disabled) return;
   if (!token()) { dialog.showModal(); tokenInput.focus(); return; }
-  setBusy(true); addLine('you', prompt); window.LegionWorld?.activate(agentId, prompt);
+  setBusy(true); addLine('you', prompt); setCrewStatus(agentId, 'WORKING'); const mission = queueMission(agentId, prompt); stationMessage(`Lucifer routed ${agentId.toUpperCase()} into the maze.`, true); window.LegionWorld?.activate(agentId, prompt);
+  let succeeded = false;
   try {
     const response = await fetch('/run', {method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token()}`}, body:JSON.stringify({prompt, max_turns:6})});
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || 'Gateway rejected the task');
+    succeeded = true;
     (data.events || []).forEach(event => {
       if (event.kind === 'answer') addLine('lucifer', event.payload.content);
       else if (event.kind === 'act') addLine(event.payload.tool || 'act', JSON.stringify(event.payload.result));
       else if (event.kind === 'limit') addLine('limit', `Turn limit reached: ${event.payload.max_turns}`);
     });
-  } catch (error) { addLine('error', error.message); }
-  finally { setBusy(false); window.LegionWorld?.clear(); }
+  } catch (error) { addLine('error', error.message); stationMessage(`The run failed: ${error.message}`); }
+  finally { finishMission(mission, agentId, succeeded); stationMessage(succeeded ? `${agentId.toUpperCase()} returned with a result.` : `${agentId.toUpperCase()} returned without a result.`); setBusy(false); window.LegionWorld?.clear(); }
 }
 function appendBoardValue(value) { if (!sendButton.disabled) { input.value += value; updatePlanchette(); input.focus(); } }
 const boardLetters = document.getElementById('board-letters');
@@ -77,6 +109,7 @@ document.querySelectorAll('.demon-name').forEach(field => {
     savedDemonNames[agent] = name;
     localStorage.setItem('legion-demon-names', JSON.stringify(savedDemonNames));
     document.querySelectorAll(`.task-card[data-agent="${agent}"] .task-name`).forEach(label => { label.textContent = name; });
+    document.querySelectorAll(`.crew-card[data-crew="${agent}"] b`).forEach(label => { label.textContent = name; });
   };
   field.addEventListener('change', applyName);
   field.addEventListener('blur', applyName);
