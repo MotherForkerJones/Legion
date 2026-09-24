@@ -35,6 +35,19 @@ python -m legion.main --web --port 8787
 Use `GET /health` or `POST /run` with `{ "prompt": "..." }`.
 The gateway prints an ephemeral `LEGION_AUTH_TOKEN` at startup. Send it as `Authorization: Bearer <token>` for `/run`, or set `LEGION_AUTH_TOKEN` before launch for a stable token.
 
+## Telegram gateway
+
+Create a bot with BotFather, then run the local long-polling gateway. No public inbound port is required:
+
+```powershell
+$env:LEGION_TELEGRAM_BOT_TOKEN = "123456:replace-me"
+# Optional: restrict access to comma-separated Telegram chat IDs.
+$env:LEGION_TELEGRAM_ALLOWED_CHAT_IDS = "123456789"
+python -m legion.main --telegram
+```
+
+Telegram gateway requests use the same local Ollama model, skills, memory, and Docker sandbox as the CLI. Never commit the bot token.
+
 ## Isolation
 
 Commands are refused unless Docker is available. The sandbox uses a disposable container with no network, dropped Linux capabilities, no-new-privileges, resource limits, and a read-only container root. The workspace is mounted at `/workspace`.

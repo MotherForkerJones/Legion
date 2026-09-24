@@ -21,6 +21,7 @@ from pydantic import BaseModel, Field
 from legion.core.loop import AgentEngine
 from legion.core.router import LLMRouter
 from legion.core.sandbox import Sandbox
+from legion.core.telegram import TelegramGateway
 from legion.memory.store import MemoryStore
 from legion.skills.base_skills import build_handlers, tool_definitions
 from legion.skills.loader import SkillLoader
@@ -60,6 +61,13 @@ async def run_prompt(prompt: str, workspace: Path, max_turns: int) -> None:
         print(f"[{event.kind}] {json.dumps(event.payload, ensure_ascii=True)}")
 
 
+async def run_telegram(workspace: Path, max_turns: int) -> None:
+    token = os.getenv("LEGION_TELEGRAM_BOT_TOKEN", "")
+    allowed = {int(value) for value in os.getenv("LEGION_TELEGRAM_ALLOWED_CHAT_IDS", "").split(",") if value.strip()}
+    gateway = TelegramGateway(token, lambda query: create_engine(workspace, max_turns, query), allowed_chat_ids=allowed)
+    await gateway.run()
+
+
 class WebhookRequest(BaseModel):
     prompt: str = Field(min_length=1, max_length=12_000)
     max_turns: int = Field(default=6, ge=1, le=8)
@@ -97,6 +105,7 @@ def main() -> None:
     parser.add_argument("--workspace", type=Path, default=Path(__file__).parent)
     parser.add_argument("--max-turns", type=int, default=int(os.getenv("LEGION_MAX_TURNS", "8")))
     parser.add_argument("--web", action="store_true", help="Start the local FastAPI gateway")
+    parser.add_argument("--telegram", action="store_true", help="Start the Telegram long-polling gateway")
     parser.add_argument("--port", type=int, default=8787)
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)
@@ -105,6 +114,8 @@ def main() -> None:
         app.state.workspace = args.workspace.resolve()
         print(f"LEGION_AUTH_TOKEN={app.state.auth_token}")
         uvicorn.run("legion.main:app", host="127.0.0.1", port=args.port, reload=False)
+    elif args.telegram:
+        asyncio.run(run_telegram(args.workspace.resolve(), args.max_turns))
     elif args.prompt:
         print(BANNER)
         asyncio.run(run_prompt(args.prompt, args.workspace.resolve(), args.max_turns))
