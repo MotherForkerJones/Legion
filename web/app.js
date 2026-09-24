@@ -26,10 +26,10 @@ async function checkHealth() {
     healthLabel.style.color = 'var(--green)';
   } catch (_) { healthLabel.textContent = 'GATEWAY OFFLINE'; healthLabel.style.color = 'var(--red)'; }
 }
-async function runTask(prompt) {
+async function runTask(prompt, agentId = 'chorus') {
   if (!prompt || sendButton.disabled) return;
   if (!token()) { dialog.showModal(); tokenInput.focus(); return; }
-  setBusy(true); addLine('you', prompt);
+  setBusy(true); addLine('you', prompt); window.LegionWorld?.activate(agentId, prompt);
   try {
     const response = await fetch('/run', {method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token()}`}, body:JSON.stringify({prompt, max_turns:6})});
     const data = await response.json();
@@ -40,9 +40,9 @@ async function runTask(prompt) {
       else if (event.kind === 'limit') addLine('limit', `Turn limit reached: ${event.payload.max_turns}`);
     });
   } catch (error) { addLine('error', error.message); }
-  finally { setBusy(false); }
+  finally { setBusy(false); window.LegionWorld?.clear(); }
 }
-form.addEventListener('submit', event => { event.preventDefault(); const prompt = input.value.trim(); input.value = ''; runTask(prompt); });
+form.addEventListener('submit', event => { event.preventDefault(); const prompt = input.value.trim(); input.value = ''; runTask(prompt, 'chorus'); });
 const defaultDemonNames = {auditor:'THE AUDITOR',scribe:'THE SCRIBE',oracle:'THE ORACLE',executioner:'THE EXECUTIONER',herald:'THE HERALD',chorus:'THE CHORUS'};
 let savedDemonNames = {};
 try { savedDemonNames = JSON.parse(localStorage.getItem('legion-demon-names') || '{}'); } catch (_) { savedDemonNames = {}; }
@@ -60,7 +60,7 @@ document.querySelectorAll('.demon-name').forEach(field => {
   field.addEventListener('blur', applyName);
   applyName();
 });
-document.querySelectorAll('.task-card').forEach(card => card.addEventListener('click', () => runTask(card.dataset.prompt)));
+document.querySelectorAll('.task-card').forEach(card => card.addEventListener('click', () => runTask(card.dataset.prompt, card.dataset.agent)));
 document.getElementById('settings-button').addEventListener('click', () => { tokenInput.value = token(); dialog.showModal(); tokenInput.focus(); });
 document.getElementById('settings-form').addEventListener('submit', event => { if (event.submitter?.id === 'save-token') { sessionStorage.setItem('legion-token', tokenInput.value.trim()); addLine('system', 'Connection seal stored for this session.'); } });
 setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-GB'); }, 1000);
