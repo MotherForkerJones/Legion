@@ -2,14 +2,15 @@
   const canvas = document.getElementById('world-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
   const names = { auditor:'THE AUDITOR', scribe:'THE SCRIBE', oracle:'THE ORACLE', executioner:'THE EXECUTIONER', herald:'THE HERALD', chorus:'THE CHORUS' };
   const agents = [
-    {id:'auditor', x:192, y:391, color:'#d83948', accent:'#ff9b68', station:'RISK VAULT', kind:'horned'},
-    {id:'scribe', x:389, y:287, color:'#e85d36', accent:'#ffc06b', station:'ARCHIVE ALTAR', kind:'hooded'},
-    {id:'oracle', x:604, y:391, color:'#d69b46', accent:'#fff0b0', station:'MEMORY WELL', kind:'winged'},
-    {id:'executioner', x:820, y:287, color:'#9a5ed2', accent:'#e0b5ff', station:'SANDBOX GATE', kind:'armored'},
-    {id:'herald', x:1010, y:391, color:'#4c8fe5', accent:'#9ed6ff', station:'SIGNAL SPIRE', kind:'horned'},
-    {id:'chorus', x:1120, y:287, color:'#8c8b9b', accent:'#e6e2f0', station:'ECHO CHAMBER', kind:'hooded'}
+    {id:'auditor', x:170, y:450, color:'#d83948', accent:'#ff9b68', station:'RISK VAULT', kind:'horned'},
+    {id:'scribe', x:440, y:300, color:'#e85d36', accent:'#ffc06b', station:'ARCHIVE ALTAR', kind:'hooded'},
+    {id:'oracle', x:700, y:450, color:'#d69b46', accent:'#fff0b0', station:'MEMORY WELL', kind:'winged'},
+    {id:'executioner', x:960, y:300, color:'#9a5ed2', accent:'#e0b5ff', station:'SANDBOX GATE', kind:'armored'},
+    {id:'herald', x:1230, y:450, color:'#4c8fe5', accent:'#9ed6ff', station:'SIGNAL SPIRE', kind:'horned'},
+    {id:'chorus', x:1460, y:300, color:'#8c8b9b', accent:'#e6e2f0', station:'ECHO CHAMBER', kind:'hooded'}
   ];
   let activeId = null;
   let activeSince = 0;
@@ -78,7 +79,7 @@
     text(names[agent.id] || agent.id.toUpperCase(), x, y + 63, 9, active ? '#fff1c4' : '#c0aeb5', 'center'); text(active ? 'WORKING' : 'STANDBY', x, y + 76, 7, active ? agent.accent : '#776772', 'center');
   }
   function lucifer(time) {
-    const x = 600, y = 104;
+    const x = 900, y = 104;
     ctx.beginPath(); ctx.arc(x, y + 4, 61 + Math.sin(time / 350) * 3, 0, Math.PI * 2); ctx.strokeStyle = '#e43f4f4a'; ctx.lineWidth = 2; ctx.stroke();
     ctx.fillStyle = '#3a101d'; ctx.beginPath(); ctx.moveTo(x - 42, y + 54); ctx.lineTo(x - 28, y - 5); ctx.lineTo(x, y - 25); ctx.lineTo(x + 28, y - 5); ctx.lineTo(x + 42, y + 54); ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#e43f4f'; ctx.beginPath(); ctx.moveTo(x - 20, y - 15); ctx.lineTo(x - 45, y - 57); ctx.lineTo(x - 13, y - 36); ctx.fill(); ctx.beginPath(); ctx.moveTo(x + 20, y - 15); ctx.lineTo(x + 45, y - 57); ctx.lineTo(x + 13, y - 36); ctx.fill();
@@ -90,7 +91,9 @@
     ctx.fillStyle = '#0b080c'; ctx.fillRect(0, 0, canvas.width, canvas.height); for (let y = 62; y < canvas.height; y += 34) for (let x = 0; x < canvas.width; x += 42) { ctx.fillStyle = ((x / 42 + y / 34) % 2 ? '#100c13' : '#17121a'); ctx.fillRect(x, y, 41, 33); ctx.strokeStyle = '#2b2029'; ctx.strokeRect(x + .5, y + .5, 40, 32); }
     ctx.fillStyle = '#07060a'; ctx.fillRect(0, 0, canvas.width, 62); ctx.strokeStyle = '#6c2735'; ctx.strokeRect(0, 61, canvas.width, 1); architecture(); lava(time);
     particles.forEach(p => { p.y -= p.speed; if (p.y < 64) p.y = 490; ctx.fillStyle = '#ff9b55'; ctx.globalAlpha = .25 + Math.sin(time / 400 + p.phase) * .2; ctx.fillRect(p.x, p.y, 2, 2); }); ctx.globalAlpha = 1;
-    sigil(170, 210, 70, '#bd384b'); sigil(1040, 210, 70, '#5c8bd0'); roundedRect(492, 18, 216, 76, 9, '#1a0b13', '#6c2334'); text('THE BLACK THRONE', 600, 45, 10, '#e43f4f', 'center'); text('LUCIFER CONTROL NODE', 600, 66, 8, '#967f87', 'center'); lucifer(time);
+    room(28, 330, 285, 300, '#e43f4f'); room(330, 150, 270, 260, '#ff7445'); room(625, 330, 285, 300, '#e4ad5b'); room(935, 150, 300, 260, '#9a5ed2'); room(1260, 330, 285, 300, '#4c8fe5'); room(1570, 150, 200, 260, '#8c8b9b');
+    ctx.strokeStyle = '#e43f4f66'; ctx.setLineDash([2, 9]); ctx.beginPath(); ctx.moveTo(900, 190); ctx.lineTo(900, 690); ctx.moveTo(300, 490); ctx.lineTo(1570, 490); ctx.stroke(); ctx.setLineDash([]);
+    sigil(170, 210, 70, '#bd384b'); sigil(1600, 210, 70, '#5c8bd0'); roundedRect(792, 18, 216, 76, 9, '#1a0b13', '#6c2334'); text('THE BLACK THRONE', 900, 45, 10, '#e43f4f', 'center'); text('LUCIFER CONTROL NODE', 900, 66, 8, '#967f87', 'center'); lucifer(time);
     agents.forEach(workstation); agents.forEach(agent => sprite(agent, time));
     if (activeId) { const current = agents.find(agent => agent.id === activeId); if (current) { text(`LIVE ROUTE // ${names[current.id]}`, 18, 28, 10, current.color); text(`${current.station} // ${Math.max(1, Math.floor((Date.now() - activeSince) / 1000))}s`, 18, 44, 9, '#967f87'); } }
     requestAnimationFrame(draw);
