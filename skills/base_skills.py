@@ -8,6 +8,8 @@ from typing import Any, Awaitable, Callable
 from legion.core.sandbox import Sandbox
 
 ToolHandler = Callable[[dict[str, Any]], Awaitable[dict[str, Any]]]
+MAX_FILE_BYTES = 256 * 1024
+MAX_SEARCH_FILES = 500
 
 
 def tool_definitions() -> list[dict[str, Any]]:
@@ -29,16 +31,22 @@ def build_handlers(workspace: str | Path, sandbox: Sandbox) -> dict[str, ToolHan
 
     async def read_file(arguments: dict[str, Any]) -> dict[str, Any]:
         path = safe_path(str(arguments["path"]))
+        if path.stat().st_size > MAX_FILE_BYTES:
+            raise ValueError(f"file exceeds the {MAX_FILE_BYTES}-byte read limit")
         return {"path": str(path.relative_to(root)), "content": path.read_text(encoding="utf-8")}
 
     async def search_files(arguments: dict[str, Any]) -> dict[str, Any]:
         query = str(arguments["query"])
         matches = []
         for path in root.rglob("*"):
-            if path.is_file() and path.stat().st_size < 1_000_000:
+            if any(part in {".git", "__pycache__", ".venv"} for part in path.parts):
+                continue
+            if path.is_file() and path.stat().st_size <= MAX_FILE_BYTES:
                 try:
                     if query.lower() in path.read_text(encoding="utf-8").lower():
                         matches.append(str(path.relative_to(root)))
+                        if len(matches) >= MAX_SEARCH_FILES:
+                            break
                 except UnicodeDecodeError:
                     continue
         return {"matches": matches[:100]}

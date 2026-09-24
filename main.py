@@ -14,7 +14,7 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from legion.core.loop import AgentEngine
 from legion.core.router import LLMRouter
@@ -59,11 +59,12 @@ async def run_prompt(prompt: str, workspace: Path, max_turns: int) -> None:
 
 
 class WebhookRequest(BaseModel):
-    prompt: str
-    max_turns: int = 8
+    prompt: str = Field(min_length=1, max_length=12_000)
+    max_turns: int = Field(default=6, ge=1, le=8)
 
 
 app = FastAPI(title="Legion", version="0.1.0")
+app.state.workspace = Path(os.getenv("LEGION_WORKSPACE", Path(__file__).parent)).resolve()
 
 
 @app.get("/health")
@@ -74,7 +75,7 @@ def health() -> dict[str, str]:
 @app.post("/run")
 async def run_webhook(request: WebhookRequest) -> dict[str, object]:
     try:
-        engine = create_engine(Path.cwd(), request.max_turns, request.prompt)
+        engine = create_engine(app.state.workspace, request.max_turns, request.prompt)
         events = [event async for event in engine.run(request.prompt)]
         return {"events": [{"kind": event.kind, "payload": event.payload, "at": event.at} for event in events]}
     except (ValueError, RuntimeError, OSError) as exc:
@@ -92,6 +93,7 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO)
     if args.web:
         import uvicorn
+        app.state.workspace = args.workspace.resolve()
         uvicorn.run("legion.main:app", host="127.0.0.1", port=args.port, reload=False)
     elif args.prompt:
         print(BANNER)
