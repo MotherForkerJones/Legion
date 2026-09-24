@@ -28,4 +28,4 @@ if ($models -notmatch [regex]::Escape($Model)) {
 
 Set-Location $RepoRoot
 Write-Host "Starting Legion at http://127.0.0.1:$Port"
-& $Python -m legion.main --web --port $Port
+& $Python (Join-Path $RepoRoot "main.py") --web --port $Port
