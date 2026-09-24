@@ -35,6 +35,8 @@ python -m legion.main --web --port 8787
 Use `GET /health` or `POST /run` with `{ "prompt": "..." }`.
 The gateway prints an ephemeral `LEGION_AUTH_TOKEN` at startup. Send it as `Authorization: Bearer <token>` for `/run`, or set `LEGION_AUTH_TOKEN` before launch for a stable token.
 
+Open `http://127.0.0.1:8787/` for the Legion command center. It includes the live throne status, specialist task dispatch, trace console, and a session-only token seal under the settings control.
+
 ## Telegram gateway
 
 Create a bot with BotFather, then run the local long-polling gateway. No public inbound port is required:

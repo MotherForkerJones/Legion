@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Legion // Infernal Command</title>
+  <link rel="stylesheet" href="/web/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-mark"><span class="brand-eye">◉</span><div><strong>LEGION</strong><small>INFERNAL COMMAND</small></div></div>
+      <div class="top-status"><span class="pulse"></span><span id="health-label">LINKING TO THE ABYSS</span><span class="divider"></span><span id="clock">00:00:00</span></div>
+      <button class="icon-button" id="settings-button" title="Open connection settings" aria-label="Open connection settings">⚙</button>
+    </header>
+
+    <main class="command-grid">
+      <section class="hero-panel panel-glow">
+        <div class="hero-copy"><p class="eyebrow">THE SEVENTH CIRCLE // LIVE SESSION</p><h1>Lucifer is watching.</h1><p class="hero-subtitle">Direct the infernal intelligence lattice. Every task descends through a specialist before the throne decides its fate.</p></div>
+        <div class="sigil" aria-hidden="true"><span>✦</span><i></i><b></b></div>
+        <div class="hero-stats"><div><small>MODEL</small><strong id="model-label">LOCAL / UNKNOWN</strong></div><div><small>CONTAINMENT</small><strong class="green">DOCKER ISOLATED</strong></div><div><small>THRONE</small><strong>LUCIFER / ONLINE</strong></div></div>
+      </section>
+
+      <aside class="overseer panel-glow"><div class="panel-heading"><span class="section-kicker">01 // OVERSEER</span><span class="live-dot">LIVE</span></div><div class="portrait"><div class="horn horn-left"></div><div class="horn horn-right"></div><div class="face"><span class="eye eye-left"></span><span class="eye eye-right"></span><span class="mouth">⌁</span></div></div><h2>LUCIFER</h2><p class="role">THE FIRST MIND // COMMAND AUTHORITY</p><p class="quote">"Bring me the impossible. I have all night."</p><div class="meter-label"><span>ATTENTION</span><span id="attention-value">87%</span></div><div class="meter"><span id="attention-meter"></span></div></aside>
+
+      <section class="tasks-section"><div class="section-heading"><div><span class="section-kicker">02 // DEMON TASKFORCE</span><h2>Choose your descent</h2></div><span class="task-count">06 AVAILABLE</span></div><div class="task-grid">
+        <button class="task-card crimson" data-prompt="Inspect this workspace and report the highest priority engineering risks."><span class="task-icon">⌬</span><span class="task-name">THE AUDITOR</span><span class="task-desc">Find weakness in the mortal code.</span><span class="task-action">DEPLOY <b>↗</b></span></button>
+        <button class="task-card ember" data-prompt="Search the workspace for the relevant implementation and explain the current architecture."><span class="task-icon">◈</span><span class="task-name">THE SCRIBE</span><span class="task-desc">Read the runes. Map the machine.</span><span class="task-action">DEPLOY <b>↗</b></span></button>
+        <button class="task-card gold" data-prompt="Summarize the project memory and identify the next three decisions needed."><span class="task-icon">✧</span><span class="task-name">THE ORACLE</span><span class="task-desc">Extract prophecy from memory.</span><span class="task-action">DEPLOY <b>↗</b></span></button>
+        <button class="task-card violet" data-prompt="Run a safe validation command in the Docker sandbox and report the result."><span class="task-icon">⛓</span><span class="task-name">THE EXECUTIONER</span><span class="task-desc">Make the isolated world obey.</span><span class="task-action">DEPLOY <b>↗</b></span></button>
+        <button class="task-card blue" data-prompt="Review the configured model routing and recommend the best local-first setup for this device."><span class="task-icon">◌</span><span class="task-name">THE HERALD</span><span class="task-desc">Carry signals through the void.</span><span class="task-action">DEPLOY <b>↗</b></span></button>
+        <button class="task-card ash" data-prompt="Give me a concise status report of Legion, its services, and any current limitations."><span class="task-icon">☠</span><span class="task-name">THE CHORUS</span><span class="task-desc">Make the whole pit speak at once.</span><span class="task-action">DEPLOY <b>↗</b></span></button>
+      </div></section>
+
+      <section class="console panel-glow"><div class="panel-heading"><span class="section-kicker">03 // SOUL LEDGER</span><span id="run-status">STANDBY</span></div><div class="console-body" id="console-output"><div class="console-line muted">[ throne ] awaiting your command...</div></div><form class="command-form" id="command-form"><span class="prompt-symbol">›</span><input id="prompt-input" autocomplete="off" placeholder="Whisper a task into the dark..." maxlength="12000"><button type="submit" id="send-button">SEND <span>↗</span></button></form></section>
+    </main>
+  </div>
+
+  <dialog id="settings-dialog"><form method="dialog" id="settings-form"><div class="dialog-heading"><span class="section-kicker">CONNECTION SEAL</span><button class="icon-button" value="cancel" aria-label="Close settings">×</button></div><label>Bearer token<input id="token-input" type="password" placeholder="Paste LEGION_AUTH_TOKEN"></label><p>Stored only in this browser session. The local gateway requires it for task execution.</p><div class="dialog-actions"><button value="cancel" class="secondary-button">CANCEL</button><button value="default" class="primary-button" id="save-token">SAVE SEAL</button></div></form></dialog>
+  <script src="/web/app.js"></script>
+</body>
+</html>
