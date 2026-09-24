@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from typing import Any, AsyncIterator
 
 from legion.core.router import LLMRouter
+from legion.core.sandbox import SandboxError
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +73,7 @@ class AgentEngine:
                     if name not in self.handlers:
                         raise ValueError(f"unknown tool: {name}")
                     result = await self.handlers[name](arguments)
-                except (ValueError, TypeError, json.JSONDecodeError) as exc:
+                except (SandboxError, ValueError, TypeError, json.JSONDecodeError) as exc:
                     result = {"error": str(exc)}
                 tool_message = {"role": "tool", "tool_call_id": call.get("id", str(uuid.uuid4())), "name": name, "content": json.dumps(result, ensure_ascii=True)}
                 self.history.append(tool_message)
