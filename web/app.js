@@ -43,6 +43,23 @@ async function runTask(prompt) {
   finally { setBusy(false); }
 }
 form.addEventListener('submit', event => { event.preventDefault(); const prompt = input.value.trim(); input.value = ''; runTask(prompt); });
+const defaultDemonNames = {auditor:'THE AUDITOR',scribe:'THE SCRIBE',oracle:'THE ORACLE',executioner:'THE EXECUTIONER',herald:'THE HERALD',chorus:'THE CHORUS'};
+let savedDemonNames = {};
+try { savedDemonNames = JSON.parse(localStorage.getItem('legion-demon-names') || '{}'); } catch (_) { savedDemonNames = {}; }
+document.querySelectorAll('.demon-name').forEach(field => {
+  const agent = field.dataset.agent;
+  if (savedDemonNames[agent]) field.value = savedDemonNames[agent];
+  const applyName = () => {
+    const name = field.value.trim().toUpperCase() || defaultDemonNames[agent];
+    field.value = name;
+    savedDemonNames[agent] = name;
+    localStorage.setItem('legion-demon-names', JSON.stringify(savedDemonNames));
+    document.querySelectorAll(`.task-card[data-agent="${agent}"] .task-name`).forEach(label => { label.textContent = name; });
+  };
+  field.addEventListener('change', applyName);
+  field.addEventListener('blur', applyName);
+  applyName();
+});
 document.querySelectorAll('.task-card').forEach(card => card.addEventListener('click', () => runTask(card.dataset.prompt)));
 document.getElementById('settings-button').addEventListener('click', () => { tokenInput.value = token(); dialog.showModal(); tokenInput.focus(); });
 document.getElementById('settings-form').addEventListener('submit', event => { if (event.submitter?.id === 'save-token') { sessionStorage.setItem('legion-token', tokenInput.value.trim()); addLine('system', 'Connection seal stored for this session.'); } });
